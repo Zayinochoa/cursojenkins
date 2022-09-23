@@ -4,7 +4,7 @@ node {
     def buildInfo = Artifactory.newBuildInfo()
     
     stage 'Complicacion/Build'
-        git branch: 'main', url: 'https://github.com/Zayinochoa/cursojenkins'
+        git branch: 'main', url: 'https://github.com/Zayinochoa/cursojenkins.git'
 
     stage 'Configuracion Artifactory'
         rtGradle.tool = 'gradle' // Como le asignamos al nombre de la herramienta en Jenkins en configuración
@@ -15,14 +15,14 @@ node {
             buildInfo.env.capture = true
             buildInfo.env.filter.addInclude("*")
         }
-        
-         stage('Configuraciones extra de gradle') {
+
+        stage('Configuraciones extra de gradle') {
             rtGradle.usesPlugin = true // El plugin ya está definifo en el build script
         }
         stage('Ejecutar Gradle') {
             rtGradle.run rootDir: "artifactory/", tasks: 'clean artifactoryPublish', buildInfo: buildInfo
-
-        stage('Publish build info') {
+        }
+        stage('Publicar buildInfo') {
             server.publishBuildInfo buildInfo
         }
 }
