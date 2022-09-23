@@ -15,7 +15,11 @@ node {
             buildInfo.env.capture = true
             buildInfo.env.filter.addInclude("*")
         }
-
+        
+         stage('rtGradle.usesPlugin = true') {
+            // some block
+        }
+        
         stage('Gradle build') {
             buildInfo = rtGradle.run rootDir: "artifactory/", buildFile: 'build.gradle', tasks: 'clean artifactoryPublish'
         }
