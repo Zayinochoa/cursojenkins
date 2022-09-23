@@ -1,0 +1,27 @@
+node {
+    // Get Artifactory server instance, defined in the Artifactory Plugin administration page.
+    def server = Artifactory.server "zayinochoa.jfrog.io"
+    // Create an Artifactory Gradle instance.
+    def rtGradle = Artifactory.newGradleBuild()
+    def buildInfo
+
+    stage('Clone sources') {
+        git branch: 'main', url: 'https://github.com/Zayinochoa/cursojenkins.git'
+    }
+
+    stage('Artifactory configuration') {
+        // Tool name from Jenkins configuration
+        rtGradle.tool = "Gradle-6.7"
+        // Set Artifactory repositories for dependencies resolution and artifacts deployment.
+        rtGradle.deployer repo:'default-gradle-dev-local', server: server
+        rtGradle.resolver repo:'default-gradle-dev', server: server
+    }
+
+    stage('Gradle build') {
+        buildInfo = rtGradle.run rootDir: "artifactory/", buildFile: 'build.gradle', tasks: 'clean artifactoryPublish'
+    }
+
+    stage('Publish build info') {
+        server.publishBuildInfo buildInfo
+    }
+}
