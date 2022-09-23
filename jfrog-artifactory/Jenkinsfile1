@@ -16,10 +16,7 @@ node {
             buildInfo.env.filter.addInclude("*")
         }
 
-        stage('Configuraciones extra de gradle') {
-            rtGradle.usesPlugin = true // El plugin ya está definifo en el build script
-        }
-       stage('Gradle build') {
+        stage('Gradle build') {
             buildInfo = rtGradle.run rootDir: "artifactory/", buildFile: 'build.gradle', tasks: 'clean artifactoryPublish'
         }
 
