@@ -8,11 +8,16 @@ node {
 
     stage ('Artifactory configuration') {
         rtGradle.tool = 'gradle' // Como le asignamos al nombre de la herramienta en Jenkins en configuración
-        rtGradle.deployer releaseRepo: 'default-gradle-dev-local', snapshotRepo: 'libs-snapshot-local', server: server
-        rtGradle.resolver releaseRepo: 'default-gradle-dev', snapshotRepo: 'libs-snapshot', server: server
-        buildInfo = Artifactory.newBuildInfo()
+        rtGradle.deployer repo:'default-gradle-dev-local',  server: server
+        rtGradle.resolver repo:'default-gradle-dev', server: server
+
+    stage ('Configuracion buildInfo') {
         buildInfo.env.capture = true
         buildInfo.env.filter.addInclude("*")
+    }
+
+    stage ('Configuraciones extra de gradle') {
+        rtGradle.usesPlugin = true // El plugin ya está definifo en el build script
     }
 
     stage ('Ejecutar Gradle') {
