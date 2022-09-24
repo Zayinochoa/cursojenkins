@@ -1,27 +1,25 @@
 node {
-    // Get Artifactory server instance, defined in the Artifactory Plugin administration page.
     def server = Artifactory.server "zayinochoa.jfrog.io"
-    // Create an Artifactory Gradle instance.
     def rtGradle = Artifactory.newGradleBuild()
-    def buildInfo
-
-    stage('Clone sources') {
-        git branch: 'main', url: 'https://github.com/Zayinochoa/cursojenkins.git'
+    
+    stage ('Clone') {
+        git branch: 'main', url: 'https://github.com/macloujulian/gs-gradle.git'
     }
 
-    stage('Artifactory configuration') {
-        // Tool name from Jenkins configuration
-        rtGradle.tool = "Gradle-6.7"
-        // Set Artifactory repositories for dependencies resolution and artifacts deployment.
-        rtGradle.deployer repo:'default-gradle-dev-local', server: server
-        rtGradle.resolver repo:'default-gradle-dev', server: server
+    stage ('Artifactory configuration') {
+        rtMaven.tool = 'gradle' // Como le asignamos al nombre de la herramienta en Jenkins en configuración
+        rtMaven.deployer releaseRepo: 'default-gradle-dev-local', snapshotRepo: 'libs-snapshot-local', server: server
+        rtMaven.resolver releaseRepo: 'default-gradle-dev', snapshotRepo: 'libs-snapshot', server: server
+        buildInfo = Artifactory.newBuildInfo()
+        buildInfo.env.capture = true
+        buildInfo.env.filter.addInclude("*")
     }
 
-    stage('Gradle build') {
-        buildInfo = rtGradle.run rootDir: "artifactory/", buildFile: 'build.gradle', tasks: 'clean artifactoryPublish'
+    stage ('Ejecutar Gradle') {
+        rtGradle.run rootDir: 'gradle-example/artifactory/', tasks: 'clean artifactoryPublish', buildInfo: buildInfo
     }
 
-    stage('Publish build info') {
+    stage ('Publish build info') {
         server.publishBuildInfo buildInfo
     }
 }
