@@ -11,14 +11,14 @@ node {
         rtGradle.deployer repo:'default-gradle-dev-local',  server: server
         rtGradle.resolver repo:'default-gradle-dev', server: server
 
-    stage ('Configuracion buildInfo') {
-        buildInfo.env.capture = true
-        buildInfo.env.filter.addInclude("*")
-    }
+        stage('Configuracion buildInfo') {
+            buildInfo.env.capture = true
+            buildInfo.env.filter.addInclude("*")
+        }
 
-    stage ('Configuraciones extra de gradle') {
-        rtGradle.usesPlugin = true // El plugin ya está definifo en el build script
-    }
+        stage('Configuraciones extra de gradle') {
+            rtGradle.usesPlugin = true // El plugin ya está definifo en el build script
+        }
 
     stage ('Ejecutar Gradle') {
         rtGradle.run rootDir: 'gradle-example/artifactory/', tasks: 'clean artifactoryPublish', buildInfo: buildInfo
